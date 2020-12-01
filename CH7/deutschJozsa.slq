@@ -1,0 +1,58 @@
+// Deutsch-Jozsa algorithm 
+// - Returns : | 0 if f is balanced (#{x, f(x)=0} = #{x, f(x)=1})
+//             | 1 if f is constant (∀x f(x)=0 or ∀x f(x)=1)
+
+
+def deutsch_jozsa[n:!ℕ](f: const int[n] !→ lifted 𝔹):!𝔹{
+  cand := 0:int[n];
+  for k in [0..n) { cand[k] := H(cand[k]); }
+
+  // state ignoring normalization:
+  // ∑ᵥ|v⟩
+
+  if f(cand) {
+	  phase(π);
+  }
+
+  // state ignoring normalization:
+  // ∑ᵥ(-1)^f(v)|v⟩
+
+  for k in [0..n) { cand[k] := H(cand[k]); }
+
+  // state ignoring normalization:
+  //   ∑ᵥ(-1)^f(v) ∑ᵤ (-1)^(u·v)|u⟩  
+
+  result := measure(cand);
+  // probability to measure 0 is:
+  // - 1 if f constant (constructive interference) 
+  // - 0 if f balanced (destructive interference)
+  return result==0;
+}
+
+// TEST
+
+def test_balanced() {
+  def balanced(x:int[2])lifted:𝔹{
+    if (x[0]==1) { 
+      return 1:𝔹;
+    }
+    else {
+      return 0:𝔹;
+    }
+  } // implements a balanced function (outputs half 0 and half 1)
+  x := deutsch_jozsa(balanced);
+  assert(x == 0); 
+}
+
+def test_constant() {
+  def constant(x:int[2])lifted:𝔹{
+    return 1:𝔹;
+  } // implements a constant function (outputs only 1)
+  x := deutsch_jozsa(constant);
+  assert(x == 1);
+}
+
+def main() {
+  test_balanced();
+  test_constant();
+}

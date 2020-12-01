@@ -1,0 +1,52 @@
+// Bernstein-Vazirani algorithm
+// - Returns s where f(x) = s·x mod 2
+//
+
+def bernstein_vazirani[n:!ℕ](f: const uint[n] !→ lifted 𝔹):!uint[n]{
+  cand := 0:uint[n];
+  for k in [0..n) { cand[k] := H(cand[k]); }
+
+  // state ignoring normalization:
+  // ∑ᵥ|v⟩
+
+  if f(cand) {
+    phase(π);
+  }
+
+  // state ignoring normalization:
+  //   ∑ᵥ(-1)^f(v)  |v⟩
+  // = ∑ᵥ(-1)^(s·v) |v⟩
+  // = (|0⟩+(-1)^(s₁)|1⟩) ⊗ ⋯ ⊗ (|0⟩+(-1)^(sₙ)|1⟩)
+
+  for k in [0..n) { cand[k] := H(cand[k]); }
+
+  s := measure(cand);
+  return s;
+}
+
+// TEST
+
+def f[n:!ℕ](s:!uint[n])(x:uint[n])lifted:𝔹{
+  y := scal(s, x)%2;
+  return y==1;
+}
+
+def scal[n:!ℕ](const x:uint[n], const y:uint[n])qfree:uint[n] { 
+  // computes the scalar product x·y
+  count := 0:uint[n];
+  for k in [0..n) { 
+    count+=x[k] && y[k];
+  }
+  return count;
+}
+
+def main() {
+  for i in [0..8) {
+	  s := i coerce !uint[4];
+	  s₀ := bernstein_vazirani(f(s));
+	  assert(s==s₀);
+  }
+}
+
+
+
