@@ -1,0 +1,58 @@
+// Grover's algorithm for a known number (M) of solutions
+// - Returns one of the x for which f(x) = 1
+//
+// - More detailed description: https://arxiv.org/ftp/arxiv/papers/0705/0705.4171.pdf
+
+
+import helpers.groverDiffusion;
+
+def grover_multiple[n:!ℕ](f: const uint[n] !→ lifted 𝔹, M:!ℕ):!ℕ{
+	nIterations:= round((π/4) * sqrt(2^n/M));
+	cand:=0:uint[n];
+    for k in [0..n) { cand[k] := H(cand[k]); }
+	
+	for k in [0..nIterations){
+		if f(cand){
+			phase(π);
+		}
+		cand:=groverDiffusion(cand);
+	}
+	return measure(cand) as !ℕ;
+}
+
+// EXAMPLE CALL
+
+def main(){
+	f := λ(x:uint[5])lifted:𝔹{ return x==4 || x==5 || x==6; }; 
+	// creates an oracle which outputs one only when x is in {4,5,6}
+	
+	x := grover_multiple(f, 3); 
+	
+	assert(x==4 || x==5 || x==6); 
+	// verifies that grover_multiple finds one of the right solutions
+}
+
+// TEST
+
+def test_grover_multiple() {
+	n := 6;
+	def f2(x:uint[n])lifted:𝔹{
+    	return x==2 || x==3;
+	}
+	def f3(x:uint[n])lifted:𝔹{
+    	return x==4 || x==5 || x==6;
+	}
+	def f4(x:uint[n])lifted:𝔹{
+    	return x==7 || x==8 || x==9 || x==10;
+	} // creates oracles with respectively 2, 3 and 4 solutions
+	x := grover_multiple(f2, 2);
+	y := grover_multiple(f3, 3);
+	z := grover_multiple(f4, 4);
+	// verifies that grover_multiple finds one of the right solutions
+	assert(x==2 || x==3);
+	assert(y==4 || y==5 || y==6);
+	assert(z==7 || z==8 || z==9 || z==10);
+}
+
+
+

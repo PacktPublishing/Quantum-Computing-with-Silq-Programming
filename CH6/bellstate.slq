@@ -1,0 +1,16 @@
+def main() {
+  return BellState();
+}
+
+def BellState(){
+  b:=1:𝔹;
+  b:=H(b);
+   
+  c:=1:𝔹;
+  if b{
+    c := X(c);
+  }
+
+  return (b,c);
+
+}

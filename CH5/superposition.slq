@@ -1,0 +1,72 @@
+// Superposition generation
+// - Generates the (normalized) superposition |0⟩ + ... + |N-1⟩ on k qubits  
+//  
+// - Requires N < 2^k
+
+def superposition[k:!ℕ](N:!ℕ, qs:𝔹^k)mfree:𝔹^k{ 
+    // generates the (normalized) superposition |0⟩ + ... + |N-1⟩ on k qubits
+
+    assert(N <= 2^k); 
+    // ensures that the biggest state |N-1⟩ requires less than k qubits to be written
+   
+    n := floor(log(N)/log(2)) coerce !ℕ;
+    r := N - 2^n coerce !ℕ;
+    // decomposition N = 2^n + r
+
+    // rotate first qubit
+    (head,)~tail := qs; 
+    θ := 2*asin(sqrt(r)/sqrt(N));
+    // sin(θ/2) = sqrt(r/N), cos(θ/2) = sqrt((N-r)/N) = sqrt(2^n/N)
+	
+    head := rotY(θ, head); 
+    // |0⟩ ↦ cos(θ/2)|0⟩ + sin(θ/2)|1⟩ = sqrt(2^n/N) |0⟩ + sqrt(r/N)|1⟩
+
+    // state : 
+    // (sqrt(2^n)/sqrt(N))|0⟩⊗(|0⟩⊗ ⋯ ⊗|0⟩) + (sqrt(r)/sqrt(N))|1⟩⊗(|0⟩⊗ ⋯ ⊗|0⟩)
+
+    // conditionally on first qubit either prepare 
+    // the uniform distribution on n qubits or 
+    // (recursively) the remainder |0⟩ + ... + |r-1⟩
+    if head {
+        tail := superposition(r, tail); // (|0⟩ + ... + |r-1⟩)/sqrt(r)
+    }
+    else {
+        for i in [0..n) { tail[i] := H(tail[i]); } // ∑ᵥ|v⟩/sqrt(2^n)
+    }
+
+    // tail = (x₁, ..., xₙ, xₙ₊₁, ..., xₖ) and 
+    // head (= x₀) is the MSB of (x₁, ..., xₙ, x₀)
+    for i in [0..n div 2) { (tail[i], tail[n-1-i]) := (tail[n-1-i], tail[i]); } 
+    // tail = (xₙ, ..., x₁, xₙ₊₁, ..., xₖ)
+    
+    qs:=(head,)~tail;                                                           
+    // qs = (x₀, xₙ, ..., x₁, xₙ₊₁, ..., xₖ)
+    
+    for i in [0..(n+1) div 2) { (qs[i], qs[n-i]) := (qs[n-i], qs[i]); }         
+    // qs = (x₁, ..., xₙ, x₀, xₙ₊₁, ..., xₖ)
+
+    // state :   
+    // (sqrt(2^n)/sqrt(N))|0⟩⊗(∑ᵥ|v⟩/sqrt(2^n)) + 
+    // (sqrt(r)/sqrt(N))|1⟩⊗((|0⟩ + ... + |r-1⟩)/sqrt(r)
+    // = (1/sqrt(N))(|0⟩ + ... + |N-1⟩)
+
+    return qs;
+}
+
+// TEST
+
+def test_superposition() { 
+    k := 5;
+    qs := vector(k, 0:𝔹);
+    qs := superposition(19, qs);
+    measure(qs);
+}
+
+// EXAMPLE CALL
+
+def main() {
+    N := 19;
+    qs := superposition(N,  vector(5, 0:𝔹)) as uint[5];
+    n := measure(qs);
+    assert(n < N);
+}

@@ -1,0 +1,45 @@
+// Grover's algorithm for a single solution
+// - Returns the only x for which f(x) = 1
+//
+// - More detailed description: https://www.scottaaronson.com/qclec/22.pdf
+
+import helpers.groverDiffusion;
+
+def grover[n:!ℕ](f: const uint[n] !→ lifted 𝔹):!ℕ{ 
+	nIterations:= round(π / 4 * sqrt(2^n));
+	cand:=0:uint[n];
+    for k in [0..n) {cand[k] := H(cand[k]);} 
+	
+	for k in [0..nIterations){
+		if f(cand){
+			phase(π);
+		}		
+		// state ignoring normalization:   
+    	// ∑(v≠w)|v⟩ - |w*⟩
+		cand:=groverDiffusion(cand);  
+    	// ∑(v≠w)γ₋|v⟩ + γ₊|w*⟩
+	}
+	return measure(cand) as !ℕ;
+}
+
+// EXAMPLE CALL
+
+def main() {
+	f := λ(x:uint[5])lifted:𝔹{return x==3;}; // creates an oracle which outputs one only when x=3
+	x := grover(f); 
+	assert(x==3); // verifies that grover finds the right solution
+}
+
+// TEST 
+
+def test_grover() {
+	n := 5;
+	def f(x:uint[n])lifted:𝔹{
+    	return x==3;
+	} // creates an oracle which outputs one only when x=3
+	x := grover(f);
+	// verifies that grover finds the right solution
+	assert(x==3);
+}
+
+

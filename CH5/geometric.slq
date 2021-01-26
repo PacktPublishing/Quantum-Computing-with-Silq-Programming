@@ -1,0 +1,13 @@
+def main() {
+  return geometric();
+}
+
+def geometric():!ℕ{
+    count := 0;
+    ok := true;
+    while ok{
+        count += 1;
+        ok = measure(H(false));
+    }
+    return count;
+}

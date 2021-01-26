@@ -1,0 +1,22 @@
+// Random number generators
+
+def uniformInt(range:!ℕ){
+    // returns x~{0,...range-1}
+    n:=ceil(log(range)/log(2)) coerce !ℕ;
+    r:=range;
+    while (r>range-1) {
+        // rerolls r if it is greater than range
+        r=0;
+        for k in [0..n){
+            // rolls each bit of r
+            r+=2^k*rand();
+        }   
+    }
+    return r;
+}
+
+def rand(){
+    // quantum number generator
+    return measure(H(false));
+}
+

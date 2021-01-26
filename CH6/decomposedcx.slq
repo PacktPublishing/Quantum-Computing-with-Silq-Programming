@@ -1,0 +1,17 @@
+def main() {
+  return DecomposedCX();
+}
+
+def DecomposedCX(){
+  b:=1:𝔹;
+  b:=H(b);
+
+  a:=1:𝔹;
+  if a{
+    b := Z(b);
+  }
+
+  b:=H(b);
+
+  return b;
+}

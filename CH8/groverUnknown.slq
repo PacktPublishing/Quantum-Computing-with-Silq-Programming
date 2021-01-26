@@ -1,0 +1,78 @@
+// Grover's algorithm for an unknown number of solutions
+// - Returns one of the x for which f(x) = 1
+//
+// - More detailed description: https://arxiv.org/pdf/1709.01236.pdf
+
+import helpers.groverDiffusion;
+import helpers.rand;
+
+def grover_unknown[n:!ℕ](f: const uint[n] !→ lifted 𝔹):!ℕ{
+	m := 1:!ℚ;
+	l := 6/5;
+
+	while (m <= 2^(n/2)) {
+		nIterations := uniformInt(floor(m) coerce !ℕ) + 1;
+		
+		cand := 0:uint[n];
+    	for k in [0..n) {cand[k] := H(cand[k]);}
+		
+		for k in [0..nIterations){
+			if f(cand){
+				phase(π);
+			}
+		cand:=groverDiffusion(cand);
+		}
+
+		x := measure(cand);
+
+		if f(x) {return x as !ℕ;}
+		else {m=l*m;}
+	}
+
+	return 0;
+}
+
+// EXAMPLE CALL
+
+def main(){
+	f := λ(x:uint[5])lifted:𝔹{ return x==1 || x==2 || x==5 || x==8; }; 
+	// creates an oracle which outputs one only when x is in {1,2,5,8}
+	
+	x := grover_unknown(f); 
+	
+	assert(x==1 || x==2 || x==5 || x==8); 
+	// verifies that grover_unknown finds one of the right solutions
+}
+
+
+
+// TEST 
+
+def test_grover_unknown() {
+	n := 5;
+	def f1(x:uint[n])lifted:𝔹{
+    	return x==1;
+	}
+	def f2(x:uint[n])lifted:𝔹{
+    	return x==2 || x==3;
+	}
+	def f3(x:uint[n])lifted:𝔹{
+    	return x==4 || x==5 || x==6;
+	}
+	def f4(x:uint[n])lifted:𝔹{
+    	return x==7 || x==8 || x==9 || x==10;
+	}
+	 // creates oracles with respectively 1, 2, 3 and 4 solutions
+	x := grover_unknown(f1);
+	y := grover_unknown(f2);
+	z := grover_unknown(f3);
+	w := grover_unknown(f4);
+	// verifies that grover_unknown finds one of the right solutions
+	assert(x==1);
+	assert(y==2 || y==3);
+	assert(z==4 || z==5 || z==6);
+	assert(w==7 || w==8 || w==9 || w==10);
+}
+
+
+

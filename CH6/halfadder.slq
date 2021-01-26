@@ -1,0 +1,31 @@
+def main() {
+  return HalfAdder();
+}
+
+def HalfAdder(){
+  // Define 4 Qubits - a & b inputs, s & c are sum and carry - outputs
+  a:=1:𝔹;
+  b:=1:𝔹;
+  s:=0:𝔹;
+  c:=0:𝔹;
+
+  // XOR Gate Operation
+
+  // CX operation on b and s qubit
+  if b{
+    s := X(s);
+  }
+  
+  // CX operation on a and s
+  if a{
+    s := X(s);
+  }
+
+  // AND Gate Operation
+
+  if a && b{
+    c := X(c);
+  }
+
+  return (s,c);
+}
