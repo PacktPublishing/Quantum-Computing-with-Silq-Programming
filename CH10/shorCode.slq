@@ -9,38 +9,38 @@ def applyToEach[τ,τ'](triple:τ^3, f: τ !→ τ') { // apply a function to ea
     (h0,h1,h2) := triple;
     fTriple := (f(h0),f(h1),f(h2));
 
-	return fTriple;
+    return fTriple;
 }
 
 
 
 def triplicate(ψ:𝔹) mfree {  // entangle a qubit with two duplicates 
-	ψ := (dup(ψ), dup(ψ), ψ);
+    ψ := (dup(ψ), dup(ψ), ψ);
 
-	return ψ;
+    return ψ;
 }
 
 def encode(ψ:B) {  // encode a single qubit ψ into a 9-qubit state
-	ψ := triplicate(ψ);
+    ψ := triplicate(ψ);
     ψ := applyToEach(ψ, H);
-	ψ := applyToEach(ψ, triplicate);
+    ψ := applyToEach(ψ, triplicate);
 
     return ψ;
 }
 
 def correct(ψ:𝔹^3) { // correct a single bit-flip error if there is one
-	// measure the error syndrome
-	a1 := measure(ψ[0] ⊕ ψ[1]);
-	a2 := measure(ψ[0] ⊕ ψ[2]);
+    // measure the error syndrome
+    a1 := measure(ψ[0] ⊕ ψ[1]);
+    a2 := measure(ψ[0] ⊕ ψ[2]);
 
     // apply the appropriate correction
-	if (a1 && a2) {
-		ψ[0] := X(ψ[0]);
-	} else if (a1) {
-		ψ[1] := X(ψ[1]);
-	} else if (a2) {
-		ψ[2] := X(ψ[2]);
-	}
+    if (a1 && a2) {
+        ψ[0] := X(ψ[0]);
+    } else if (a1) {
+        ψ[1] := X(ψ[1]);
+    } else if (a2) {
+        ψ[2] := X(ψ[2]);
+    }
 
     return ψ;
 }
@@ -52,9 +52,9 @@ def correctBitFlip(ψ:(B^3)^3) {  // correct a single bit-flip error in each tri
 }
 
 def correctPhaseFlip(ψ:(B^3)^3) { // correct a single phase-flip error
-	ψ := applyToEach(ψ, reverse(triplicate));
-	ψ := applyToEach(ψ, H);
-	ψ := correct(ψ);
+    ψ := applyToEach(ψ, reverse(triplicate));
+    ψ := applyToEach(ψ, H);
+    ψ := correct(ψ);
 
     return ψ
 }
