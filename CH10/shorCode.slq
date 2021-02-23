@@ -1,0 +1,95 @@
+// Shor code (Quantum error correction)
+// - Returns the qubit ψ where ψ is encoded to a 9-qubit state and then  
+// - passed through a noisy channel potentially altering the state of one of the qubits
+
+
+// Helper function
+
+def applyToEach[τ,τ'](triple:τ^3, f: τ !→ τ') { // apply a function to each element of a triple
+    (h0,h1,h2) := triple;
+    fTriple := (f(h0),f(h1),f(h2));
+
+	return fTriple;
+}
+
+
+
+def triplicate(ψ:𝔹) mfree {  // entangle a qubit with two duplicates 
+	ψ := (dup(ψ), dup(ψ), ψ);
+
+	return ψ;
+}
+
+def encode(ψ:B) {  // encode a single qubit ψ into a 9-qubit state
+	ψ := triplicate(ψ);
+    ψ := applyToEach(ψ, H);
+	ψ := applyToEach(ψ, triplicate);
+
+    return ψ;
+}
+
+def correct(ψ:𝔹^3) { // correct a single bit-flip error if there is one
+	// measure the error syndrome
+	a1 := measure(ψ[0] ⊕ ψ[1]);
+	a2 := measure(ψ[0] ⊕ ψ[2]);
+
+    // apply the appropriate correction
+	if (a1 && a2) {
+		ψ[0] := X(ψ[0]);
+	} else if (a1) {
+		ψ[1] := X(ψ[1]);
+	} else if (a2) {
+		ψ[2] := X(ψ[2]);
+	}
+
+    return ψ;
+}
+
+def correctBitFlip(ψ:(B^3)^3) {  // correct a single bit-flip error in each triplet of a triplet of triplets
+    ψ := applyToEach(ψ, correct);
+
+    return ψ;
+}
+
+def correctPhaseFlip(ψ:(B^3)^3) { // correct a single phase-flip error
+	ψ := applyToEach(ψ, reverse(triplicate));
+	ψ := applyToEach(ψ, H);
+	ψ := correct(ψ);
+
+    return ψ
+}
+
+def shor_code(ψ:B,  channel: (B^3)^3 !→ (B^3)^3){ // simulate the Shor code error-correcting process
+    ψ := encode(ψ);
+
+    ψ := channel(ψ);
+
+    ψ := correctBitFlip(ψ); 
+    ψ := correctPhaseFlip(ψ);
+
+    ψ := reverse(triplicate)(ψ);
+
+    return ψ;
+}
+
+// Examples
+
+def channel(ψ:(𝔹^3)^3) { // flip both one qubit and its phase in a 3x3 structure
+    ψ[0][1] := Z(ψ[0][1]); 
+    ψ[0][1] := X(ψ[0][1]); 
+    return ψ; 
+}
+
+def main() {
+    // Example 1: basis state
+    ψ := 1:𝔹; 
+    φ := shor_code(ψ, channel); 
+    forget(φ=1);
+
+    // Example 2: superposition
+    ψ := H(1:𝔹); 
+    φ := shor_code(ψ, channel); 
+    forget(H(φ)=1);
+
+ 
+}

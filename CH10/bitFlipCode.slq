@@ -1,0 +1,57 @@
+// Bit-Flip code (Quantum error correction)
+// - Returns the qubit ψ where ψ is encoded to a 3-qubit state and then  
+// - passed through a noisy channel potentially flipping one of the qubits
+
+
+def encode(ψ:𝔹) mfree { // encode a single qubit ψ into a 3-qubit state
+    ψ := (dup(ψ), dup(ψ), ψ);
+	
+	return ψ;
+}
+
+def correct(ψ:𝔹^3) { // correct a single bit-flip error if there is one
+	// measure the error syndrome
+	p1 := measure(ψ[0] ⊕ ψ[1]);
+	p2 := measure(ψ[0] ⊕ ψ[2]);
+
+    // apply the appropriate correction
+	if (p1 && p2) {
+		ψ[0] := X(ψ[0]);
+	} else if (p1) {
+		ψ[1] := X(ψ[1]);
+	} else if (p2) {
+		ψ[2] := X(ψ[2]);
+	}
+
+    return ψ;
+}
+
+def bit_flip_code(ψ: 𝔹, channel: 𝔹^3 !→ 𝔹^3) { // simulate the bit-flip code error-correcting process
+    ψ := encode(ψ);
+    ψ := channel(ψ);
+    ψ := correct(ψ);
+    ψ := reverse(encode)(ψ);
+
+    return ψ;
+}
+
+// Examples
+
+def channel(ψ:𝔹^3) { // flip the first qubit of a 3-qubit state
+	ψ[0] := X(ψ[0]);
+	return ψ;
+}
+
+def main() {
+	// Example 1: basis state
+    ψ := 1:𝔹; 
+    φ := bit_flip_code(ψ, channel); 
+    forget(φ = 1);
+
+	// Example 2: superposition
+    ψ := H(1:𝔹); 
+    φ := bit_flip_code(ψ, channel); 
+    forget(H(φ) = 1);
+}
+
+
