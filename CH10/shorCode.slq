@@ -90,6 +90,4 @@ def main() {
     ψ := H(1:𝔹); 
     φ := shor_code(ψ, channel); 
     forget(H(φ)=1);
-
- 
 }
