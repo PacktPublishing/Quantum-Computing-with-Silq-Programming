@@ -31,9 +31,9 @@ def prepareState(n:!ℕ) {
     basesA := 0:!int[n];
     
     for i in [0..n){ // generates random bits and random bases
-		bitsA[i] = rand();
+	bitsA[i] = rand();
         basesA[i] = rand();
-	}
+    }
 
     qubitsA := bitsA:int[n];
     for i in [0..n){ // encodes each qubit to be sent in the corresponding base
@@ -49,7 +49,7 @@ def measureB[n:!ℕ](qubitsA:int[n]) {
     
     for i in [0..n){ // generates random bases
         basesB[i] = rand();
-	}
+    }
 
     for i in [0..n){ // decodes each received qubit according to the bases
         if basesB[i] {qubitsA[i] := H(qubitsA[i]);}
