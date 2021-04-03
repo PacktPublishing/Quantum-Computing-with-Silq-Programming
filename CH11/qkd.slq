@@ -1,0 +1,190 @@
+// Quantum Key Distribution 
+// - Simulates the generation of a secure key through an insecure channel
+
+
+// Helper functions
+
+// Returns 0 or 1 with equal probability
+def rand(){
+    return measure(H(false));
+}
+
+// Random number generator
+def uniformInt(range:!ℕ){
+    // returns x~{0,...range-1}
+    n:=ceil(log(range)/log(2)) coerce !ℕ;
+    r:=range;
+    while (r>range-1) {
+        // rerolls r if it is greater than range
+        r=0;
+        for k in [0..n){
+            // rolls each bit of r
+            r+=2^k*rand();
+        }   
+    }
+    return r;
+}
+
+def prepareState(n:!ℕ) { 
+    // prepares n random bits each encoded as a qubit in a random base 
+    bitsA := 0:!int[n];
+    basesA := 0:!int[n];
+    
+    for i in [0..n){ // generates random bits and random bases
+		bitsA[i] = rand();
+        basesA[i] = rand();
+	}
+
+    qubitsA := bitsA:int[n];
+    for i in [0..n){ // encodes each qubit to be sent in the corresponding base
+        if basesA[i] {qubitsA[i] = H(qubitsA[i]);}
+    }
+
+    return(bitsA, basesA, qubitsA);
+}
+
+def measureB[n:!ℕ](qubitsA:int[n]) { 
+    // generates n random bases to measure the received bits
+    basesB := 0:!int[n];
+    
+    for i in [0..n){ // generates random bases
+        basesB[i] = rand();
+	}
+
+    for i in [0..n){ // decodes each received qubit according to the bases
+        if basesB[i] {qubitsA[i] := H(qubitsA[i]);}
+    }
+    bitsB := measure(qubitsA);
+    return (bitsB, basesB);
+}
+
+def compareBases[n:!ℕ](basesA:!int[n], basesB:!int[n]) { 
+    // returns the correctly guessed bases
+    indices := 0:!int[n];
+    nInfo := 0:!ℕ;
+    indices = ~(basesA ⊕ basesB); // keeps indices where bases coincide
+    for i in [0..n){ 
+        nInfo+=indices[i];
+    }
+    return (indices, nInfo);
+}
+
+def computePresumablySharedInfo[n:!ℕ](indices:!int[n], bitsA:!int[n], 
+                                bitsB:!int[n], nInfo:!ℕ) {
+
+    infoA := 0:!int[nInfo]; // contains the presumbaly shared information on A part
+    infoB := 0:!int[nInfo];
+    count := 0:!ℕ;
+    i := 0:!ℕ;
+    while (count < nInfo) { // computes the presumably shared information
+        if indices[i] {
+            infoA[count] = bitsA[i];
+            infoB[count] = bitsB[i];            
+            count+=1;
+        }
+        i+=1;
+    }
+    return (infoA, infoB);
+}
+
+def checkEavesdropper[n:!ℕ](infoA:!int[n], 
+                            infoB:!int[n],
+                            nSharedBits:!ℕ) {
+    bitsRevealed := 0:!ℕ;
+    noE := true;
+    count := 0:!ℕ;
+    i := 0:!ℕ;
+    notAlreadyChecked := 2^n - 1 coerce !int[n];
+    while (bitsRevealed < n - nSharedBits) { 
+    // checks that no eavesdropper has gained info about the shared secret  
+    // by comparing some bits
+        i = uniformInt(n);
+        if notAlreadyChecked[i] {
+            // checks that random bits coincide
+            noE &= (infoA[i] == infoB[i]);
+            notAlreadyChecked[i] = false;
+            bitsRevealed+=1;
+        }
+    }
+    return (notAlreadyChecked, noE);
+}
+
+def computeSharedInfo[n:!ℕ](indices:!int[n], bitsA:!int[n], 
+                            bitsB:!int[n], nInfo:!ℕ, nSharedBits:!ℕ) { 
+    // computes shared information
+    
+    // nSharedBits is the number of remaining bits after 'burning' some of them 
+    // to detect the presence of an eavesdropper
+    assert (nSharedBits < nInfo);
+
+    (infoA, infoB) := computePresumablySharedInfo(indices, bitsA, bitsB, nInfo);
+
+    (notAlreadyChecked, noE) := checkEavesdropper(infoA, infoB, nSharedBits);
+
+    sharedInfo := 0:!int[nSharedBits]; 
+    // contains the shared information to be used if no eavesdroper has been detected
+    
+    count := 0:!ℕ;
+    i := 0:!ℕ;
+    while (count < nSharedBits) { // computes the shared information
+        if notAlreadyChecked[i] {
+            sharedInfo[count] = infoA[i];
+            count+=1;
+        }
+        i+=1;
+    }
+
+    return (sharedInfo, noE); 
+    // returns the shared information and the detection or not of an eavesdropper
+}
+
+def qkd[n:!ℕ](channel: int[n] !→ int[n]){
+    (bitsA, basesA, qubitsA) := prepareState(n); 
+    // prepares the random bases and bits and the qubits to be send to B
+
+    qubitsA := channel(qubitsA); 
+    // simulates the transfer through a potentially malicious channel 
+
+    (bitsB, basesB) := measureB(qubitsA); 
+    // generates the guesses from B
+
+    (indices, nInfo) := compareBases(basesA, basesB); 
+    // compares the bases between A and B
+
+
+    nSharedBits := floor((2/3)*nInfo) coerce !ℕ;
+    
+    (sharedInfo, noE) := computeSharedInfo(indices, bitsA, bitsB, nInfo, nSharedBits);  
+    // computes the shared information obtained 
+    // and the potential detection of an eavesdropper
+    
+
+    return (noE, nSharedBits); 
+    // returns whether an eavesdropper was detected (0 if detection)
+    // and how many bits of info are shared
+}
+
+// TEST
+
+def testQKDnoE() { // tests QKD with no eavesdropper 
+    n := 10;
+    channel := λ(b:int[n]). b; // channel = id
+    (noE, nSharedBits) := qkd[n](channel);
+    assert(noE); // no detection of eavesdropper (noE=1)
+    print(noE, nSharedBits);
+}
+
+def testQKDE() { // tests QKD with an eavesdropper 
+    n := 10;
+    channel := λ(b:int[n]){ for i in [0..n) {b[i] := H(b[i])}; return b; }; 
+    // channel alters the qubits
+    (noE, nSharedBits) := qkd[n](channel);
+    print(noE, nSharedBits);
+}
+
+// EXAMPLE CALL
+
+def main() {
+    testQKDnoE();
+    testQKDE(); 
+}
