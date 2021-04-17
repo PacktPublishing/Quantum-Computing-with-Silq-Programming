@@ -1,0 +1,60 @@
+// Simon's algorithm 
+
+def main() {
+  return Simon();
+}
+
+def Simon(){
+  // Initializing Qubits for Inputs - a,b,c and Oracle - d,e,f
+  a:=0:𝔹;
+  b:=0:𝔹;
+  c:=0:𝔹;
+  d:=0:𝔹;
+  e:=0:𝔹;
+  f:=0:𝔹;
+
+  // Applying Hadamard to Inputs
+  a:=H(a);
+  b:=H(b);
+  c:=H(c);
+
+  // Encoding 011 secret key in the Oracle
+
+  if b{
+    d := X(d);
+  }
+
+  if b{
+    e := X(e);
+  }
+
+  if c{
+    d := X(d);
+  }
+
+  if b{
+    f := X(f);
+  }
+
+  if c{
+    e := X(e);
+  }
+
+  if c{
+    f := X(f);
+  }
+
+  // Applying Hadamard to Inputs
+
+  a:=H(a);
+  b:=H(b);
+  c:=H(c);
+
+  // Measure the d,e,f qubits for variable consumption
+
+  md:=measure(d);
+  me:=measure(e);
+  mf:=measure(f);
+
+  return (a,b,c,md,me,mf);
+}

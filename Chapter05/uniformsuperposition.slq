@@ -1,0 +1,11 @@
+def main() {
+  return UniformSuperposition[1]();
+}
+
+def UniformSuperposition[n:!ℕ]():𝔹^n{
+  qubits := vector(n,0:𝔹); // vector of length n filled with zeros
+  for i in [0..n){
+    qubits[i] := H(qubits[i]);
+  }
+  return qubits;
+}

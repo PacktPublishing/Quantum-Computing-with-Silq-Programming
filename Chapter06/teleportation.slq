@@ -1,0 +1,42 @@
+def main() {
+  return Teleportation();
+}
+
+def Teleportation(){
+
+  // Initialize Qubits - 'a' qubit is to be teleported by Alice to Bob
+  a:=0:𝔹;
+  b:=0:𝔹;
+  c:=0:𝔹;
+
+  // Alice's Operations
+
+  // Creating the Bell State
+  b:=H(b);
+
+  if b{
+    c := X(c);
+  }
+
+  // Alice applies CX and H to 'a' qubit
+
+  if a{
+    b := X(b);
+  }
+
+  a:=H(a);
+
+  // Alice measures her qubits 'a' and 'b'
+
+  ma1:=measure(a);
+  ma2:=measure(b);
+  print(ma1);
+  print(ma2);
+
+  // Bob's measurement
+
+  //c:=X(c);
+  //c:=Z(c);
+
+  return (c);
+}

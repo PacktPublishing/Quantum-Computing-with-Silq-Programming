@@ -1,0 +1,36 @@
+def CSWAP(x:𝔹, y:𝔹, z:𝔹) {
+  if x{
+    a:=z;
+    z:=y;
+    y:=a;
+  }
+  return (x,y,z);
+}
+
+def SWAP(x:𝔹, y:𝔹) {
+  a:=y;
+  y:=x;
+  x:=a;
+  return (x,y);
+}
+
+def CCX(const x:𝔹,const y:𝔹,z:𝔹):𝔹{
+  if x && y{
+    z := X(z);
+  }
+  return (z);
+}
+
+def CZ(const x:𝔹,y:𝔹):𝔹{
+  if x{
+    y := Z(y);
+  }
+  return y;
+}
+
+def CX(const x:𝔹,y:𝔹):𝔹{
+  if x{
+    y := X(y);
+  }
+  return y;
+}
