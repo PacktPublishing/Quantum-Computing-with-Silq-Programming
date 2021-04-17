@@ -38,7 +38,7 @@ def phase_flip_code(ψ: 𝔹, channel: 𝔹^3 !→ 𝔹^3) { // simulate the pha
     return ψ;
 }
 
-// Examples
+/* EXAMPLES */
 
 def channel(ψ:𝔹^3) { // flip the phase of the second qubit of a 3-qubit state
     ψ[1] := Z(ψ[1]);
@@ -49,12 +49,14 @@ def main() {
     // Example 1: basis state
     ψ := 0:𝔹; 
     φ := phase_flip_code(ψ, channel); 
+    // verifies that φ = 0
     forget(φ = 0);
 
     // Example 2: superposition
     ψ := H(0:𝔹); 
     φ := phase_flip_code(ψ, channel); 
-    forget(H(φ) = 0);
+    // verifies that φ = H(|0>)
+    return φ;
 }
 
 

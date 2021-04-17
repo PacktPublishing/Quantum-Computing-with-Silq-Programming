@@ -24,7 +24,7 @@ def bernstein_vazirani[n:!ℕ](f: const uint[n] !→ lifted 𝔹):!uint[n]{
   return s;
 }
 
-// TEST
+/* TEST */
 
 def f[n:!ℕ](s:!uint[n])(x:uint[n])lifted:𝔹{
   y := scal(s, x)%2;
@@ -41,11 +41,18 @@ def scal[n:!ℕ](const x:uint[n], const y:uint[n])qfree:uint[n] {
 }
 
 def main() {
+  // test  with all secret strings on 3 bits
   for i in [0..8) {
-	  s := i coerce !uint[4];
+	  s := i coerce !uint[3];
 	  s₀ := bernstein_vazirani(f(s));
 	  assert(s==s₀);
   }
+
+  // test with secret string s = 01
+  s := 1 coerce !uint[2];
+  s₀ := bernstein_vazirani(f(s));
+  return s₀;
+
 }
 
 

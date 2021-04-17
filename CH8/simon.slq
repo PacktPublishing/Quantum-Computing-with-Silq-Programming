@@ -1,8 +1,7 @@
 // Simon's algorithm 
 
 def main() {
-    for k in [0..1024) {return Simon()}
-  assert(false);
+  return Simon();
 }
 
 def Simon(){

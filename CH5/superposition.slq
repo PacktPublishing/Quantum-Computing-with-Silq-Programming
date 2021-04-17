@@ -53,7 +53,7 @@ def superposition[k:!ℕ](N:!ℕ, qs:𝔹^k)mfree:𝔹^k{
     return qs;
 }
 
-// TEST
+/* TEST */
 
 def test_superposition() { 
     k := 5;
@@ -62,11 +62,15 @@ def test_superposition() {
     measure(qs);
 }
 
-// EXAMPLE CALL
+/* EXAMPLE CALL */
 
 def main() {
     N := 19;
+    // generates the normalized superposition |0⟩ + ... + |18⟩ on 5 qubits
     qs := superposition(N,  vector(5, 0:𝔹)) as uint[5];
-    n := measure(qs);
+
+    // measures 0 <= n < 19 
+    n := measure(qs); 
     assert(n < N);
+    return(n);
 }

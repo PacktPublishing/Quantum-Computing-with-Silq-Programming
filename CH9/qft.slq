@@ -15,3 +15,9 @@ def QFT[n:!ℕ](ψ: int[n])mfree: int[n]{
 	}
 	return ψ;
 }
+
+
+def main(){
+	ψ := 2:int[2];
+	return QFT(ψ);
+}

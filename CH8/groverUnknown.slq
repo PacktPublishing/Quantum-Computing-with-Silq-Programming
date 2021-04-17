@@ -32,7 +32,7 @@ def grover_unknown[n:!ℕ](f: const uint[n] !→ lifted 𝔹):!ℕ{
 	return 0;
 }
 
-// EXAMPLE CALL
+/* EXAMPLE CALL */
 
 def main(){
 	f := λ(x:uint[5])lifted:𝔹{ return x==1 || x==2 || x==5 || x==8; }; 
@@ -42,12 +42,15 @@ def main(){
 	
 	assert(x==1 || x==2 || x==5 || x==8); 
 	// verifies that grover_unknown finds one of the right solutions
+
+	return x;
 }
 
 
 
-// TEST 
+/* TEST */ 
 
+// This function defines tests for Grover with respectively 1, 2, 3 and 4 solutions
 def test_grover_unknown() {
 	n := 5;
 	def f1(x:uint[n])lifted:𝔹{

@@ -20,20 +20,23 @@ def grover_multiple[n:!ℕ](f: const uint[n] !→ lifted 𝔹, M:!ℕ):!ℕ{
 	return measure(cand) as !ℕ;
 }
 
-// EXAMPLE CALL
+/* EXAMPLE CALL */
 
 def main(){
-	f := λ(x:uint[5])lifted:𝔹{ return x==4 || x==5 || x==6; }; 
+	f := λ(x:uint[6])lifted:𝔹{ return x==4 || x==5 || x==6; }; 
 	// creates an oracle which outputs one only when x is in {4,5,6}
 	
 	x := grover_multiple(f, 3); 
 	
 	assert(x==4 || x==5 || x==6); 
 	// verifies that grover_multiple finds one of the right solutions
+
+	return x;
 }
 
-// TEST
+/* TEST */
 
+// This function defines tests for Grover with respectively 2, 3 and 4 solutions
 def test_grover_multiple() {
 	n := 6;
 	def f2(x:uint[n])lifted:𝔹{

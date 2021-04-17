@@ -13,7 +13,6 @@ def applyToEach[τ,τ'](triple:τ^3, f: τ !→ τ') { // apply a function to ea
 }
 
 
-
 def triplicate(ψ:𝔹) mfree {  // entangle a qubit with two duplicates 
     ψ := (dup(ψ), dup(ψ), ψ);
 
@@ -72,7 +71,7 @@ def shor_code(ψ:B,  channel: (B^3)^3 !→ (B^3)^3){ // simulate the Shor code e
     return ψ;
 }
 
-// Examples
+/* EXAMPLES */
 
 def channel(ψ:(𝔹^3)^3) { // flip both one qubit and its phase in a 3x3 structure
     ψ[0][1] := Z(ψ[0][1]); 
@@ -84,10 +83,12 @@ def main() {
     // Example 1: basis state
     ψ := 1:𝔹; 
     φ := shor_code(ψ, channel); 
+    // verifies that φ = 1
     forget(φ=1);
 
     // Example 2: superposition
     ψ := H(1:𝔹); 
     φ := shor_code(ψ, channel); 
-    forget(H(φ)=1);
+    // verifies that φ = H(|1>)
+    return φ;
 }

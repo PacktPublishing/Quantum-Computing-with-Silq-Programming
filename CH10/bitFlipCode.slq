@@ -35,7 +35,7 @@ def bit_flip_code(ψ: 𝔹, channel: 𝔹^3 !→ 𝔹^3) { // simulate the bit-f
     return ψ;
 }
 
-// Examples
+/* EXAMPLES */
 
 def channel(ψ:𝔹^3) { // flip the first qubit of a 3-qubit state
     ψ[0] := X(ψ[0]);
@@ -46,12 +46,14 @@ def main() {
     // Example 1: basis state
     ψ := 1:𝔹; 
     φ := bit_flip_code(ψ, channel); 
+    // verifies that φ = 1
     forget(φ = 1);
 
     // Example 2: superposition
     ψ := H(1:𝔹); 
     φ := bit_flip_code(ψ, channel); 
-    forget(H(φ) = 1);
+    // verifies that φ = H(|1>)
+    return φ;
 }
 
 

@@ -22,24 +22,28 @@ def grover[n:!ℕ](f: const uint[n] !→ lifted 𝔹):!ℕ{
 	return measure(cand) as !ℕ;
 }
 
-// EXAMPLE CALL
+/* EXAMPLE CALL */
 
 def main() {
 	f := λ(x:uint[5])lifted:𝔹{return x==3;}; // creates an oracle which outputs one only when x=3
 	x := grover(f); 
 	assert(x==3); // verifies that grover finds the right solution
+
+	return x;
 }
 
-// TEST 
+/* TEST */ 
 
+// This function defines a test for Grover
 def test_grover() {
-	n := 5;
-	def f(x:uint[n])lifted:𝔹{
-    	return x==3;
+	def f(x:uint[3])lifted:𝔹{
+    	return x==7;
 	} // creates an oracle which outputs one only when x=3
 	x := grover(f);
 	// verifies that grover finds the right solution
-	assert(x==3);
+	assert(x==7);
+
+	return x;
 }
 
 

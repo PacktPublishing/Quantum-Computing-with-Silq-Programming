@@ -29,7 +29,7 @@ def deutsch_jozsa[n:!ℕ](f: const int[n] !→ lifted 𝔹):!𝔹{
   return result==0;
 }
 
-// TEST
+/* TEST */
 
 def test_balanced() {
   def balanced(x:int[2])lifted:𝔹{
@@ -42,6 +42,7 @@ def test_balanced() {
   } // implements a balanced function (outputs half 0 and half 1)
   x := deutsch_jozsa(balanced);
   assert(x == 0); 
+  return x;
 }
 
 def test_constant() {
@@ -50,9 +51,11 @@ def test_constant() {
   } // implements a constant function (outputs only 1)
   x := deutsch_jozsa(constant);
   assert(x == 1);
+  return x;
 }
 
 def main() {
-  test_balanced();
-  test_constant();
+  print(test_balanced()); // DJ on balanced function should output 0
+  print(test_constant()); // DJ on constant function should output 1
+  return;
 }
