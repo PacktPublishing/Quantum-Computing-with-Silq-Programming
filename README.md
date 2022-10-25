@@ -58,3 +58,7 @@ Srinjoy Ganguly is the founder and CEO of AdroitERA, an EdTech firm, and possess
 **Thomas Cambier**
 Thomas Cambier is a French programmer and software developer. After studying top-level mathematics, physics, and computer science at Ecole Polytechnique, France's leading engineering school, he obtained a Master's degree in computer science at ETH Zürich on a broad range of subjects going from algorithmics and cryptography to object-oriented programming. Deeply interested in the promising possibilities resulting from quantum computing, he wrote his Master's thesis on the design of quantum algorithms with Silq, a brand-new high-level quantum language created by a research group at ETH Zürich.
 
+### Download a free PDF
+
+ <i>If you have already purchased a print or Kindle version of this book, you can get a DRM-free PDF version at no cost.<br>Simply click on the link to claim your free PDF.</i>
+<p align="center"> <a href="https://packt.link/free-ebook/9781800569669">https://packt.link/free-ebook/9781800569669 </a> </p>
